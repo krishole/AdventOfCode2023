@@ -3,8 +3,7 @@
 #include <string>
 
 int main() {
-	std::ifstream file("calibration.txt"); // Replace "example.txt" with your file name
-
+	std::ifstream file("calibration.txt");
 	int total = 0;
 
 	if (file.is_open()) {
