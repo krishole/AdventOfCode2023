@@ -10,55 +10,44 @@ struct SScratchCard {
 
 static std::vector<SScratchCard> s_ScratchCards;
 
-std::vector<int> FindAllNumbersInString(const std::string& line) {
-	std::vector<int> numbers;
-
-	int number = 0;
-	bool found_number = false;
-
-	for (char c : line) {
-		if (std::isdigit(c)) {
-			found_number = true;
-			number = number * 10 + (c - '0');
-		}
-		else if (found_number) {
-			found_number = false;
-			numbers.push_back(number);
-			number = 0;
-		}
-	}
-
-	if (found_number) {
-		numbers.push_back(number);
-		number = 0;
-	}
-
-	return numbers;
-}
-
 std::vector<std::string> ParseString(const std::string& line, const std::string& delimiters) {
 	std::vector<std::string> chunks;
 	size_t start_pos = 0;
 	size_t delim_pos = line.find_first_of(delimiters);
 
 	while (delim_pos != std::string::npos) {
-		chunks.push_back(line.substr(start_pos, delim_pos - start_pos));
+		std::string chunk = line.substr(start_pos, delim_pos - start_pos);
+		if (chunk.length() > 0) {
+			chunks.push_back(line.substr(start_pos, delim_pos - start_pos));
+		}
 		start_pos = delim_pos + 1;
 		delim_pos = line.find_first_of(delimiters, start_pos);
 	}
 
 	if (start_pos < line.size()) {
-		chunks.push_back(line.substr(start_pos));
+		std::string chunk = line.substr(start_pos);
+		if (chunk.length() > 0) {
+			chunks.push_back(line.substr(start_pos));
+		}
 	}
 
 	return chunks;
 }
 
-void ProcessLine(const std::string& line) {
-	const auto& parts = ParseString(line, ":|");
+std::vector<int> ParseNumbersFromString(const std::string& line) {
+	std::vector<std::string> strings = ParseString(line, " ");
+	std::vector<int> numbers;
+	for (const std::string& string : strings) {
+		numbers.push_back(std::stoi(string));
+	}
+	return numbers;
+}
 
-	const auto& winning_numbers = FindAllNumbersInString(parts[1]);
-	const auto& your_numbers = FindAllNumbersInString(parts[2]);
+void ProcessLine(const std::string& line) {
+	const std::vector<std::string> parts = ParseString(line, ":|");
+
+	const std::vector<int> winning_numbers = ParseNumbersFromString(parts[1]);
+	const std::vector<int> your_numbers = ParseNumbersFromString(parts[2]);
 
 	int winners = 0;
 
