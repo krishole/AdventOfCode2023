@@ -32,15 +32,11 @@ void LoadRegion(const std::vector<std::string>& lines, int region_start, int reg
 	if (s_RegionCounter == -1) {
 		s_Seeds = ParseNumbersFromString(ParseString(lines[region_start], ":")[1]);
 	} else {
-		SMapData data;
-		data.m_Type = static_cast<EMapType>(s_RegionCounter);
+		EMapType type = static_cast<EMapType>(s_RegionCounter);
 
 		for (int i = region_start + 1; i <= region_end; ++i) {
 			const std::vector<unsigned long long > numbers = ParseNumbersFromString(lines[i]);
-			data.m_DestStart = numbers[0];
-			data.m_SourceStart = numbers[1];
-			data.m_Range = numbers[2];
-			s_Maps.push_back(data);
+			s_Maps.push_back({ type, numbers[0], numbers[1], numbers[2] });
 		}
 	}
 
@@ -52,7 +48,6 @@ void ProcessLines(const std::vector<std::string>& lines) {
 	for (int i = 0; i < static_cast<int>(lines.size()); i++) {
 		if (lines[i].length() == 0 || i == lines.size() - 1) {
 			LoadRegion(lines, region_start, i - 1);
-
 			region_start = i+1;
 		}
 	}
