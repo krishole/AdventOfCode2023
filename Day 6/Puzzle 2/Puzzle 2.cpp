@@ -1,7 +1,8 @@
 #include <iostream>
 #include <fstream>
 #include <algorithm>
-#include "Utils.h"
+#include <string>
+#include <vector>
 
 typedef unsigned long long ull;
 struct SRaceData {
