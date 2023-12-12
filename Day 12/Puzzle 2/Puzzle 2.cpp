@@ -2,8 +2,6 @@
 #include <fstream>
 #include <algorithm>
 #include <cmath>
-#include <future>
-#include <thread>
 #include "Utils.h"
 
 #include <unordered_map>
