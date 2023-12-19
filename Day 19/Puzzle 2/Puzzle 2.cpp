@@ -61,64 +61,50 @@ unsigned long long RangeTotal(std::map<char, std::pair<int, int>>& ranges) {
 	return x * m * a * s;
 }
 
+void RunRule(const SRule& rule, std::map<char, std::pair<int, int>>& success_range, std::map<char, std::pair<int, int>>& fail_range) {
+	std::pair<int, int>& range = success_range[rule.m_Rule];
+	std::pair<int, int>& frange = fail_range[rule.m_Rule];
+
+	if (rule.m_Lt) {
+		if (range.second >= rule.m_Limit) {
+			range.second = rule.m_Limit - 1;
+		}
+		if (frange.first < rule.m_Limit) {
+			frange.first = rule.m_Limit;
+		}
+	}
+	else {
+		if (range.first <= rule.m_Limit + 1) {
+			range.first = rule.m_Limit + 1;
+		}
+		if (frange.second > rule.m_Limit) {
+			frange.second = rule.m_Limit;
+		}
+	}
+}
+
 void CheckWorkflow(std::string workflow, std::map<char, std::pair<int, int>>& ranges) {
 	if (workflow == "A") {
-		//add to total
-		std::cout << "A " << RangeTotal(ranges) << std::endl;
 		s_Total += RangeTotal(ranges);
 		return;
 	} else if (workflow == "R") {
 		return;
 	}
-
-	std::cout << workflow << std::endl;
 	
+	std::map<char, std::pair<int, int>> fail_range = ranges;
 	for (const auto& rule : s_Workflows[workflow].m_Rules) {
-		//if (CheckWorkflow(rule.m_Dest, ranges)) {
-		std::map<char, std::pair<int, int>> new_ranges = ranges;
-			std::pair<int, int>& range = new_ranges[rule.m_Rule];
-
-			if (rule.m_Lt) {
-				if (range.second >= rule.m_Limit) {
-					range.second = rule.m_Limit - 1;
-				}
-			} else {
-				if (range.first <= rule.m_Limit + 1) {
-					range.first = rule.m_Limit + 1;
-				}
-			}
-			CheckWorkflow(rule.m_Dest, new_ranges);
-			//accepted = true;
-		//}
+		std::map<char, std::pair<int, int>> pass_range = fail_range;
+		RunRule(rule, pass_range, fail_range);
+		CheckWorkflow(rule.m_Dest, pass_range);
 	}
 
-	//if (CheckWorkflow(s_Workflows[workflow].m_ElseDest)) {
-		//accepted = true;
-	std::map<char, std::pair<int, int>> new_ranges = ranges;
-		//do the opposite of the rules
-		for (const auto& rule : s_Workflows[workflow].m_Rules) {
-			std::pair<int, int>& range = new_ranges[rule.m_Rule];
-
-			if (rule.m_Lt) {
-				if (range.first < rule.m_Limit) {
-					range.first = rule.m_Limit;
-				}
-			} else {
-				if (range.second > rule.m_Limit) {
-					range.second = rule.m_Limit;
-				}
-			}
-		}
-		CheckWorkflow(s_Workflows[workflow].m_ElseDest, new_ranges);
-	//}
-	//return accepted;
+	CheckWorkflow(s_Workflows[workflow].m_ElseDest, fail_range);
 }
 
 void ProcessParts() {
 	std::string workflow = "in";
 	CheckWorkflow(workflow, s_Ranges);
 
-	//size_t total = Range('x') * Range('m') * Range('a') * Range('s');
 	std::cout << "Total: " << s_Total << std::endl;
 }
 
